@@ -43,3 +43,26 @@ Luego de abrir el correo encuentras un mail de tu Líder Técnico con tu primera
 >    - Mostrar botones de "Anterior" y "Siguiente".
 
 > Desde ya muchas gracias por la colaboración! 😉 como te comente en la entrevista soy muy detallista en la prolijidad del codigo y la performance cada detalle cuenta, sin embargo si no estas seguro, es mejor que lo resuelvas como puedas y me dejes notas en el readme.md del repo, para que yo pueda probar.
+
+---
+
+## Instrucciones para la entrega
+
+Si ya terminaste, o son las 10:00, asegurate de seguir los siguientes pasos para la entrega:
+
+1. Completar el listado de rutas implementadas más abajo en este mismo archivo.
+2. Realizar un **commit** a tu repositorio con un mensaje que incluya tu **nombre completo**.
+3. Realizar un **push** a tu repositorio.
+4. Realizar un **pull request** al repositorio original.
+
+## Listado de rutas implementadas
+
+Completá la siguiente tabla indicando qué rutas/páginas implementaste:
+
+| Ruta | Descripción | Observaciones |
+|------|-------------|---------------|
+| `/` | Página de inicio | Ya implementada |
+| `/login` | Inicio de sesión | Ya implementada |
+| `/register` | Registro de usuario | Ya implementada |
+| `/movies` | Listado de películas con buscador | Ya implementada |
+| `/movies/[id]` | Detalle de película | |
