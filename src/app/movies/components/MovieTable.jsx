@@ -10,16 +10,42 @@ export default function MovieTable({ movies }) {
 
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
-    setUserEmail(email);
-    // TODO: si existe `email`, leer `localStorage.getItem("favorites_" + email)`,
-    //       parsearlo con JSON.parse y guardarlo en `favorites` con setFavorites
+
+   if(!email)return;
+    
+     setUserEmail(email);
+
+   
+
+   
+    
+    
+     try {
+      const stored = localStorage.getItem("favorites_" + email);
+      setFavorites(stored ? JSON.parse(stored) : []);
+    } catch {
+      setFavorites([]);
+    }
   }, []);
 
   function toggleFavorite(movieId) {
-    // TODO: si `movieId` ya está en `favorites`, quitarlo; si no, agregarlo.
-    //       Actualizar el estado `favorites` y guardar el nuevo array en
-    //       localStorage bajo la clave "favorites_" + userEmail (usar JSON.stringify)
+
+     let nfav = [];
+
+    if (favorites.includes(movieId)) {
+       nfav = favorites.filter((id) => id !== movieId);
+    }else{
+       nfav = [...favorites, movieId];
+    }
+
+    setFavorites(nfav);
+  
+    localStorage.setItem("favorites_" + userEmail, JSON.stringify(nfav));
+
   }
+  
+
+  const filteredMovies = movies.filter((movie) => movie.title.toLowerCase().includes(search.toLowerCase()));
 
   // TODO: filtrar el array `movies` usando `search` y guardar el resultado en `filteredMovies`
 
@@ -47,11 +73,12 @@ export default function MovieTable({ movies }) {
             <th className="px-6 py-3">Título</th>
             <th className="px-6 py-3">Plot</th>
             <th className="px-6 py-3">Cast</th>
+            <th className="px-6 py-3 text-center">Año</th>
             {userEmail && <th className="px-6 py-3 text-center">Fav</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-white/5">
-          {movies.map((movie) => (
+          {filteredMovies.map((movie) => (
             <tr key={movie._id} className="transition hover:bg-white/5 focus-within:bg-white/5">
               <td className="px-6 py-4 font-semibold text-white">
                 <button
@@ -59,7 +86,7 @@ export default function MovieTable({ movies }) {
                   className="block text-left text-inherit"
                   onClick={() => {
                     console.log(`Seleccionada película: ${movie._id} - ${movie.title}`);
-                    // TODO: redirigir al detalle cuando exista la ruta
+                    // TODO: redirigir al detalle cuando exista la ruta   
                   }}
                 >
                   {movie.title}
@@ -68,6 +95,9 @@ export default function MovieTable({ movies }) {
               <td className="px-6 py-4 text-zinc-200">{movie.plot || "-"}</td>
               <td className="px-6 py-4 text-zinc-200">
                 {movie.cast?.length ? movie.cast.join(", ") : "-"}
+              </td>
+              <td className="px-6 py-4 text-center">
+                {movie.year || "-"}
               </td>
               {userEmail && (
                 <td className="px-6 py-4 text-center">
