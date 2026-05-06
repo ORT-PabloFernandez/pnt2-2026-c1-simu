@@ -1,27 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function MovieTable({ movies }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
-
   const [userEmail, setUserEmail] = useState(null);
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
     setUserEmail(email);
-    // TODO: si existe `email`, leer `localStorage.getItem("favorites_" + email)`,
-    //       parsearlo con JSON.parse y guardarlo en `favorites` con setFavorites
+    if (email) {
+      const stored = localStorage.getItem("favorites_" + email);
+      setFavorites(stored ? JSON.parse(stored) : []);
+    }
   }, []);
 
   function toggleFavorite(movieId) {
-    // TODO: si `movieId` ya está en `favorites`, quitarlo; si no, agregarlo.
-    //       Actualizar el estado `favorites` y guardar el nuevo array en
-    //       localStorage bajo la clave "favorites_" + userEmail (usar JSON.stringify)
+    const updated = favorites.includes(movieId)
+      ? favorites.filter((id) => id !== movieId)
+      : [...favorites, movieId];
+    setFavorites(updated);
+    localStorage.setItem("favorites_" + userEmail, JSON.stringify(updated));
   }
 
-  // TODO: filtrar el array `movies` usando `search` y guardar el resultado en `filteredMovies`
+  const filteredMovies = movies.filter((m) =>
+    m.title?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,54 +47,53 @@ export default function MovieTable({ movies }) {
           para poder guardar películas favoritas.
         </p>
       )}
-    <div className="overflow-x-auto rounded-3xl border border-white/10 bg-white/5">
-      <table className="min-w-full divide-y divide-white/10 text-left text-sm text-white">
-        <thead className="bg-white/5 text-xs uppercase tracking-[0.4em] text-zinc-400">
-          <tr>
-            <th className="px-6 py-3">Título</th>
-            <th className="px-6 py-3">Plot</th>
-            <th className="px-6 py-3">Cast</th>
-            {userEmail && <th className="px-6 py-3 text-center">Fav</th>}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/5">
-          {movies.map((movie) => (
-            <tr key={movie._id} className="transition hover:bg-white/5 focus-within:bg-white/5">
-              <td className="px-6 py-4 font-semibold text-white">
-                <button
-                  type="button"
-                  className="block text-left text-inherit"
-                  onClick={() => {
-                    console.log(`Seleccionada película: ${movie._id} - ${movie.title}`);
-                    // TODO: redirigir al detalle cuando exista la ruta
-                  }}
-                >
-                  {movie.title}
-                </button>
-              </td>
-              <td className="px-6 py-4 text-zinc-200">{movie.plot || "-"}</td>
-              <td className="px-6 py-4 text-zinc-200">
-                {movie.cast?.length ? movie.cast.join(", ") : "-"}
-              </td>
-              {userEmail && (
-                <td className="px-6 py-4 text-center">
+      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-white/5">
+        <table className="min-w-full divide-y divide-white/10 text-left text-sm text-white">
+          <thead className="bg-white/5 text-xs uppercase tracking-[0.4em] text-zinc-400">
+            <tr>
+              <th className="px-6 py-3">Título</th>
+              <th className="px-6 py-3">Año</th>
+              <th className="px-6 py-3">Plot</th>
+              <th className="px-6 py-3">Cast</th>
+              {userEmail && <th className="px-6 py-3 text-center">Fav</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {filteredMovies.map((movie) => (
+              <tr key={movie._id} className="transition hover:bg-white/5 focus-within:bg-white/5">
+                <td className="px-6 py-4 font-semibold text-white">
                   <button
                     type="button"
-                    onClick={() => toggleFavorite(movie._id)}
-                    className={`text-xl transition hover:scale-110 ${
-                      favorites.includes(movie._id) ? "text-red-500" : "text-zinc-600"
-                    }`}
-                    aria-label={favorites.includes(movie._id) ? "Quitar de favoritos" : "Agregar a favoritos"}
+                    className="block text-left text-inherit hover:underline"
+                    onClick={() => router.push(`/movies/${movie._id}`)}
                   >
-                    {favorites.includes(movie._id) ? "♥" : "♡"}
+                    {movie.title}
                   </button>
                 </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                <td className="px-6 py-4 text-zinc-200">{movie.year ?? "-"}</td>
+                <td className="px-6 py-4 text-zinc-200">{movie.plot || "-"}</td>
+                <td className="px-6 py-4 text-zinc-200">
+                  {movie.cast?.length ? movie.cast.join(", ") : "-"}
+                </td>
+                {userEmail && (
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      type="button"
+                      onClick={() => toggleFavorite(movie._id)}
+                      className={`text-xl transition hover:scale-110 ${
+                        favorites.includes(movie._id) ? "text-red-500" : "text-zinc-600"
+                      }`}
+                      aria-label={favorites.includes(movie._id) ? "Quitar de favoritos" : "Agregar a favoritos"}
+                    >
+                      {favorites.includes(movie._id) ? "♥" : "♡"}
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
